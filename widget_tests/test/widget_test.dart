@@ -18,13 +18,15 @@ void main() {
     /// 3 - findsWidgets : verifies if it finds more than 0 widgets
 
     // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
+    expect(find.byKey(const Key('CounterValue')), findsOneWidget);
     expect(find.text('1'), findsNothing);
 
     // Tap the '+' icon and trigger a frame.
     await tester.tap(find.byIcon(Icons.add));
+
     // pump has to be used when setState is called or state changes
-    await tester.pump();
+    // when added duration, it "goes to the future" in that duration. Thus async calls will be already done(pump doesn't wait, it skips)
+    await tester.pump(Duration(seconds: 10));
 
     // Verify that our counter has incremented.
     expect(find.text('0'), findsNothing);
