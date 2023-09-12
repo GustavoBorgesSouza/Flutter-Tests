@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:api_consume/api_service.dart';
 import 'package:api_consume/product.dart';
 import 'package:mocktail/mocktail.dart';
@@ -12,8 +10,11 @@ class UnoMock extends Mock implements Uno {}
 class ResponseMock extends Mock implements Response {}
 
 void main() {
+  final uno = UnoMock();
+  // reset stub
+  tearDown(() => reset(uno));
+
   test('Must return a list of products', () {
-    final uno = UnoMock();
     final response = ResponseMock();
 
     // stubs config here
@@ -30,8 +31,6 @@ void main() {
     );
   });
   test('Must return an empty list of products when there is an error', () {
-    final uno = UnoMock();
-
     when(() => uno.get(any())).thenThrow(UnoError('error  '));
 
     final service = APIService(uno);
