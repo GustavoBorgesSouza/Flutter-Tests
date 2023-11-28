@@ -2,7 +2,7 @@ import '../models/task.dart';
 
 sealed class BoardState {}
 
-class LoadingState implements BoardState {}
+class LoadingBoardState implements BoardState {}
 
 class GettedTasksBoardState implements BoardState {
   final List<Task> tasks;
