@@ -20,7 +20,7 @@ void main() {
         () async {
           when(() => repository.fetch()).thenAnswer(
             (_) async => [
-              const Task(id: 'id', description: 'Task real', checked: false),
+              const Task(id: 'id', description: 'Task real'),
             ],
           );
 
@@ -52,6 +52,53 @@ void main() {
           );
 
           await cubit.fetchTasks();
+        },
+      );
+    },
+  );
+
+  group(
+    'addTask | ',
+    () {
+      test(
+        'Must add a task',
+        () async {
+          when(() => repository.update(any())).thenAnswer((_) async => []);
+
+          expect(
+            cubit.stream,
+            emitsInOrder([
+              isA<GettedTasksBoardState>(),
+            ]),
+          );
+
+          const task = Task(id: 'Id', description: 'Description');
+          await cubit.addTask(task);
+
+          final state = cubit.state as GettedTasksBoardState;
+
+          expect(state.tasks.length, 1);
+          expect(state.tasks, [task]);
+        },
+      );
+
+      test(
+        'Must Return a Failure State when failing',
+        () async {
+          when(() => repository.update(any())).thenThrow(
+            Exception('Error'),
+          );
+
+          expect(
+            cubit.stream,
+            emitsInOrder([
+              isA<FailureBoardState>(),
+            ]),
+          );
+
+          const task = Task(id: 'Id', description: 'Description');
+
+          await cubit.addTask(task);
         },
       );
     },

@@ -20,7 +20,23 @@ class BoardCubit extends Cubit<BoardState> {
     }
   }
 
-  Future<void> addTask(Task task) async {}
+  Future<void> addTask(Task task) async {
+    final state = this.state;
+
+    if (state is! GettedTasksBoardState) {
+      return;
+    }
+
+    final tasks = state.tasks.toList();
+
+    tasks.add(task);
+    try {
+      await boardRepository.update(tasks);
+      emit(GettedTasksBoardState(tasks: tasks));
+    } catch (e) {
+      emit(FailureBoardState('Error'));
+    }
+  }
 
   Future<void> removeTask(Task task) async {}
 

@@ -8,7 +8,7 @@ class Task extends Equatable {
   const Task({
     required this.id,
     required this.description,
-    required this.checked,
+    this.checked = false,
   });
 
   @override
