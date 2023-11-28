@@ -22,66 +22,60 @@ class BoardCubit extends Cubit<BoardState> {
   }
 
   Future<void> addTask(Task task) async {
-    final state = this.state;
+    final tasks = _getTasks();
 
-    if (state is! GettedTasksBoardState) {
-      return;
-    }
-
-    final tasks = state.tasks.toList();
+    if (tasks == null) return;
 
     tasks.add(task);
-    try {
-      await boardRepository.update(tasks);
-      emit(GettedTasksBoardState(tasks: tasks));
-    } catch (e) {
-      emit(FailureBoardState('Error'));
-    }
+
+    await emitTasks(tasks);
   }
 
   Future<void> removeTask(Task task) async {
-    final state = this.state;
+    final tasks = _getTasks();
 
-    if (state is! GettedTasksBoardState) {
-      return;
-    }
-
-    // Trabalha na cópia da lista, conceito de imutabilidade
-    final tasks = state.tasks.toList();
+    if (tasks == null) return;
 
     tasks.remove(task);
-    try {
-      await boardRepository.update(tasks);
-      emit(GettedTasksBoardState(tasks: tasks));
-    } catch (e) {
-      emit(FailureBoardState('Error'));
-    }
+
+    await emitTasks(tasks);
   }
 
   Future<void> checkTask(Task task) async {
-    final state = this.state;
+    final tasks = _getTasks();
 
-    if (state is! GettedTasksBoardState) {
-      return;
-    }
-
-    final tasks = state.tasks.toList();
+    if (tasks == null) return;
 
     final index = tasks.indexOf(task);
     tasks[index] = task.copyWith(checked: !tasks[index].checked);
 
-    // tasks.(task);
-    try {
-      await boardRepository.update(tasks);
-      emit(GettedTasksBoardState(tasks: tasks));
-    } catch (e) {
-      emit(FailureBoardState('Error'));
-    }
+    await emitTasks(tasks);
   }
 
   // metodo helper pra test
   @visibleForTesting
   void addTasks(List<Task> tasks) {
     emit(GettedTasksBoardState(tasks: tasks));
+  }
+
+  List<Task>? _getTasks() {
+    final state = this.state;
+
+    if (state is! GettedTasksBoardState) {
+      return null;
+    }
+
+    // Trabalha na cópia da lista, conceito de imutabilidade
+    // deep copy
+    return state.tasks.toList();
+  }
+
+  Future<void> emitTasks(List<Task> tasks) async {
+    try {
+      await boardRepository.update(tasks);
+      emit(GettedTasksBoardState(tasks: tasks));
+    } catch (e) {
+      emit(FailureBoardState('Error'));
+    }
   }
 }
